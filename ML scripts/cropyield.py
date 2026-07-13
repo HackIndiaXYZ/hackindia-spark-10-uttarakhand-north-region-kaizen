@@ -2,28 +2,27 @@ import pandas as pd
 import math
 from datetime import datetime, timedelta, timezone
 
-# ---------- CONFIG ----------
+
 TIME_STEP_MIN = 1  # minutes
 OUTPUT_CSV = "solar_dataset_india.csv"
 DEFAULT_SHADE_AZ_RANGES = [(100, 150), (200, 220)]  # example shading zones
-# ----------------------------
 
 def solar_position(lat, lon, dt_utc):
-    """Calculate solar elevation and azimuth in degrees."""
+    
     N = dt_utc.timetuple().tm_yday
     h = dt_utc.hour + dt_utc.minute/60 + dt_utc.second/3600
     gamma = 2*math.pi/365 * (N - 1 + (h-12)/24)
 
-    # Equation of time
+
     eqtime = 229.18*(0.000075 + 0.001868*math.cos(gamma) - 0.032077*math.sin(gamma)
                       -0.014615*math.cos(2*gamma) -0.040849*math.sin(2*gamma))
 
-    # Solar declination
+    
     decl = (0.006918 -0.399912*math.cos(gamma) +0.070257*math.sin(gamma)
             -0.006758*math.cos(2*gamma)+0.000907*math.sin(2*gamma)
             -0.002697*math.cos(3*gamma)+0.00148*math.sin(3*gamma))
 
-    # Hour angle
+    
     tst = h*60 + eqtime + 4*lon
     H = math.radians(tst/4 - 180)
 
@@ -41,7 +40,7 @@ def solar_position(lat, lon, dt_utc):
     return round(elev_deg,2), round(az_deg,2)
 
 def shade_factor(elev, az, shade_zones=DEFAULT_SHADE_AZ_RANGES):
-    """Return shade factor (0-1) based on elevation and azimuth."""
+    
     if elev <= 0:
         return 0.0
     for start, end in shade_zones:
@@ -82,7 +81,7 @@ def generate_solar_dataset(lat, lon, year, month, day, start_hour=0, end_hour=23
     df = pd.DataFrame(rows)
     return df
 
-# ---------- USER INPUT ----------
+
 lat = float(input("Enter latitude (e.g., 29.37 for Bhimtal): "))
 lon = float(input("Enter longitude (e.g., 79.53 for Bhimtal): "))
 year = int(input("Enter year (e.g., 2025): "))
