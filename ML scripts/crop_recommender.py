@@ -6,7 +6,7 @@ from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 import json
 import sys
 
-# Himalayan crop realistic ranges
+
 crops_info = {
     'Wheat':     {'alt': (1400,1800), 'temp': (10,20), 'rain': (80,150), 'moisture': (30,60)},
     'Maize':     {'alt': (1200,1700), 'temp': (15,22), 'rain': (70,130), 'moisture': (40,70)},
@@ -15,7 +15,7 @@ crops_info = {
     'Buckwheat': {'alt': (1700,2500), 'temp': (10,17),'rain': (50,180), 'moisture': (25,60)}
 }
 
-# Step 1: Generate synthetic realistic data
+
 rows = []
 for crop, info in crops_info.items():
     for _ in range(100):  # 100 samples per crop
@@ -32,7 +32,7 @@ for crop, info in crops_info.items():
 
 df = pd.DataFrame(rows, columns=['soil_N','soil_P','soil_K','pH','moisture','rainfall','temperature','altitude','slope','crop','yield_kg'])
 
-# Step 2: Train ML Models
+
 X = df[['soil_N','soil_P','soil_K','pH','moisture','rainfall','temperature','altitude','slope']]
 y_crop = df['crop']
 y_yield = df['yield_kg']
@@ -43,7 +43,7 @@ clf_crop.fit(X, y_crop)
 reg_yield = RandomForestRegressor(n_estimators=100, random_state=42)
 reg_yield.fit(X, y_yield)
 
-# Step 3: Function to get predictions
+
 def get_recommendations(moisture, rainfall):
     altitude = random.randint(1400,2200)
     temp = random.randint(10,20)
@@ -64,14 +64,14 @@ def get_recommendations(moisture, rainfall):
         'expected_yield': expected_yield
     }
 
-# Main execution for API
+
 if __name__ == '__main__':
     # Read input from stdin (sent by the API endpoint)
     input_data = json.loads(sys.stdin.read())
     moisture = float(input_data['moisture'])
     rainfall = float(input_data['rainfall'])
     
-    # Get predictions
+    
     result = get_recommendations(moisture, rainfall)
     
     # Print the result as a JSON string to stdout
